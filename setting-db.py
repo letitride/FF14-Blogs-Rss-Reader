@@ -3,7 +3,7 @@ import MySQLdb
 conn = MySQLdb.connect(
     user='username',
     passwd='userpassword',
-    host='172.17.0.3',
+    host='172.17.0.2',
     db='ff14rssdata'
 )
 
