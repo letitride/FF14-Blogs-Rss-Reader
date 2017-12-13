@@ -4,6 +4,7 @@
 import urllib.request
 from bs4 import BeautifulSoup
 import MySQLdb
+from models import CrawlSiteList
 
 def insert_record(title, link, posted_datetime):
     conn = MySQLdb.connect(
@@ -24,17 +25,20 @@ def insert_record(title, link, posted_datetime):
     for row in cur.fetchall():
         print(row)
 
+def getRss(url):
+    res = urllib.request.urlopen(url)
+    soup = BeautifulSoup(res, "html.parser")
+    for item in soup.find_all("item"):
+        title = item.find("title").string
+        link  = item.attrs['rdf:about']
+        dt    = item.find("dc:date").string
+        insert_record(title, link, dt )
+    print(url)
 
-#馬鳥速報
-url = "http://blog.livedoor.jp/umadori0726/index.rdf"
-res = urllib.request.urlopen(url)
-soup = BeautifulSoup(res, "html.parser")
+crawlSiteList = CrawlSiteList.CrawlSiteList()
+siteList      = crawlSiteList.getSiteList()
 
-for item in soup.find_all("item"):
-    title = item.find("title").string
-    link  = item.attrs['rdf:about']
-    dt    = item.find("dc:date").string
-
-    insert_record(title, link, dt )
+for site in siteList:
+    getRss(site[1])
 
 
